@@ -1,8 +1,11 @@
-import Link from "next/link"
-import styles from "./footer.module.css"
-import { dependencies } from "../../package.json"
-import { FC } from "react"
-const Footer:FC = () => {
+import React, { FC } from 'react';
+
+import Link from 'next/link';
+
+import { dependencies } from '../../package.json';
+import styles from './footer.module.css';
+
+const Footer: FC = () => {
   return (
     <footer className={styles.footer}>
       <hr />
@@ -22,11 +25,11 @@ const Footer:FC = () => {
           </Link>
         </li>
         <li className={styles.navItem}>
-          <em>next-auth@{dependencies["next-auth"]}</em>
+          <em>next-auth@{dependencies['next-auth']}</em>
         </li>
       </ul>
     </footer>
-  )
-}
+  );
+};
 
 export default Footer;

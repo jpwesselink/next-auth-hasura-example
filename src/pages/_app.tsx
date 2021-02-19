@@ -1,9 +1,12 @@
-import { Provider } from 'next-auth/client'
-import './styles.css'
+import React from 'react';
+
+import { Provider } from 'next-auth/client';
+
+import './styles.css';
 
 // Use the <Provider> to improve performance and allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
-export default function App ({ Component, pageProps }) {
+export default function App({ Component, pageProps }) {
   return (
     <Provider
       // Provider options are not required but can be useful in situations where
@@ -23,8 +26,8 @@ export default function App ({ Component, pageProps }) {
         // windows / tabs will be updated to reflect the user is signed out.
         keepAlive: 0
       }}
-      session={pageProps.session} >
+      session={pageProps.session}>
       <Component {...pageProps} />
     </Provider>
-  )
+  );
 }
