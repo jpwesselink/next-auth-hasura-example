@@ -109,3 +109,6 @@ dist
 .env.local
 
 .DS_Store
+
+hasura-graphql-jwt-secret.json
+*.pem

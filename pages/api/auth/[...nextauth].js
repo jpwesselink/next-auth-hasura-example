@@ -1,6 +1,8 @@
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
-import jwt from "jsonwebtoken";
+import jsonwebtoken from "jsonwebtoken";
+import { decode, encode } from "../../../src/lib/jwt";
+import { jwt, session } from "../../../src/lib/callbacks";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -50,27 +52,8 @@ export default NextAuth({
     // encryption: true,
     // You can define your own encode/decode functions for signing and encryption
     // if you want to override the default behaviour.
-    encode: async ({ secret, token, maxAge }) => {
-      const jwtClaims = {
-        "sub": token.sub.toString() ,
-        "name": token.name ,
-        "email": token.email,
-        "iat": Date.now() / 1000,
-        "exp": Math.floor(Date.now() / 1000) + (24*60*60),
-        "https://hasura.io/jwt/claims": {
-          "x-hasura-allowed-roles": ["user"],
-          "x-hasura-default-role": "user",
-          "x-hasura-role": "user",
-          "x-hasura-user-id": token.id,
-        }
-      };
-      const encodedToken = jwt.sign(jwtClaims, secret, { algorithm: 'HS256'});
-      return encodedToken;
-    },
-    decode: async ({ secret, token, maxAge }) => {
-      const decodedToken = jwt.verify(token, secret, { algorithms: ['HS256']});
-      return decodedToken;
-    },
+    encode: encode,
+    decode: decode,
   },
 
   // You can define custom pages to override the built-in pages.
@@ -91,21 +74,9 @@ export default NextAuth({
   callbacks: {
     // async signIn(user, account, profile) { return true },
     // async redirect(url, baseUrl) { return baseUrl },
-    async session(session, token) { 
-      const encodedToken = jwt.sign(token, process.env.SECRET, { algorithm: 'HS256'});
-      session.id = token.id;
-      session.token = encodedToken;
-      return Promise.resolve(session);
-    },
-    async jwt(token, user, account, profile, isNewUser) { 
-      const isUserSignedIn = user ? true : false;
-      // make a http call to our graphql api
-      // store this in postgres
-      if(isUserSignedIn) {
-        token.id = user.id.toString();
-      }
-      return Promise.resolve(token);
-    }
+    session: session,
+    jwt: jwt
+    
   },
 
   // Events are useful for logging

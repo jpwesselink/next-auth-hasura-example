@@ -1,10 +1,9 @@
-# NextAuth.js Example
+# NextAuth.js + Hasura example
 
-[next-auth-example.now.sh](https://next-auth-example.now.sh)
 
 ## About this project
 
-This is an example of how to use [NextAuth.js](https://next-auth.js.org) library to add authentication to a [Next.js](https://nextjs.org) application.
+This is an example of how to use [NextAuth.js](https://next-auth.js.org) library to add authentication to a [Next.js](https://nextjs.org) application together with Hasura.
 
 ## About NextAuth.js
 
@@ -34,89 +33,88 @@ cp .env.local.example .env.local
 
 Add details for one or more providers (e.g. Google, Twitter, GitHub, Email, etc).
 
-#### Database configuration
 
-A database is needed to persist user accounts and to support email sign in, but you can still use NextAuth.js for authentication without one by using OAuth for authentication. If you do not specify a database, JSON Web Tokens will be enabled by default.
 
-You can skip configuring a database and come back to it later if you want.
+## Get those secrets right
 
-When configuring your database you should also install an appropriate node_module.
+> Do not commit these secrets to git.
 
-* **SQLite**
+### HS256
 
-  Install module:
-  `npm i sqlite3`
+Go to [https://generate-secret.now.sh/32](https://generate-secret.now.sh/32) and generate a random secret. 
+Put this secret in *two* places: 
 
-  Database URI:
-  `sqlite://localhost/:memory:?synchronize=true`
+- Create `.env.local` for Next.js
 
-* **MySQL**
-
-  Install module:
-  `npm i mysql`
-
-  Database URI:
-  `mysql://username:password@127.0.0.1:3306/database_name?synchronize=true`
-
-* **Postgres**
-
-  Install module:
-  `npm i pg`
-
-  Database URI:
-  `postgres://username:password@127.0.0.1:5432/database_name?synchronize=true`
-
-* **MongoDB**
-
-  Install module:
-  `npm i mongodb`
-
-  Database URI:
-  `mongodb://username:password@127.0.0.1:27017/database_name?synchronize=true`
-
-Notes:
-
-* The example .env specifies an in-memory SQLite database that does not persist data.
-* SQLite is suitable for development / testing but not for production.
-* The option `?synchronize=true` automatically syncs schema changes to the database. It should not be used in production as may result in data loss if there are changes to the schema or to NextAuth.js
-* You can also specify a [TypeORM connection object](https://typeorm.io/#/connection-options) in `pages/api/auth/[...nextauth].js` instead of a database URL / connection string.
-
-### 3. Configure authentication providers
-
-* Review and update options in `pages/api/auth/[...nextauth].js` as needed.
-
-* When setting up OAuth, in the developer admin page for each of your OAuth services, you should configure the callback URL to use a callback path of `{server}/api/auth/callback/{provider}`.
-
-  e.g. For Google OAuth you would use: `http://localhost:3000/api/auth/callback/google`
-
-  A list of configured providers and their callback URLs is available from the endpoint `/api/auth/providers`. You can find more information at https://next-auth.js.org/configuration/providers
-
-* You can also choose to specify an SMTP server for passwordless sign in via email.
-
-### 4. Start the application
-
-To run your site locally, use:
+It should look something like this:
 
 ```
-npm run dev
+SECRET=<insert your secret here>
 ```
 
-To run it it production mode, use:
+- Create `hasura-grahql-jwt-secret.json` for Docker compose
 
 ```
-npm build
-npm start
+{
+    "type": "HS256",
+    "key": "<insert your secret here>"
+}
 ```
 
-### 5. Configuring for production
+### RS256
 
-You must set the NEXTAUTH_URL environment variable with the URL of your site, before deploying to production.
+- Generate private key
 
-e.g. `NEXTAUTH_URL=https://example.com`
+```
+openssl genrsa -out private.pem 2048
+```
+- Generate public key
 
-To do this in on Vercel, you can use the [Vercel project dashboard](https://vercel.com/dashboard) or the `vc env` command:
+```
+openssl rsa -in private.pem -pubout -out public.pem
+```
 
-    vc env add NEXTAUTH_URL production
+- Transform public key to a single line, and copy to clipboard on Macos
 
-Be sure to also set environment variables for the Client ID and Client Secret values for all your authentication providers.
+```
+awk -v ORS='\\n' '1' private.pem | pbcopy
+```
+
+- Create `.env.local` for Next.js
+
+It should look something like this:
+
+> In double quotes, otherwise the `\n` will be escaped, resulting in a PEM routines error
+
+```
+SIGNING_ALGORITHM=RS256
+SECRET="<paste your secret here>"
+```
+
+- Transform public key to single line, and copy to clipboard on Macos.
+
+```
+awk -v ORS='\\n' '1' public.pem | pbcopy
+```
+
+- Create `hasura-grahql-jwt-secret.json` for Docker compose
+
+```
+{
+    "type": "RS256",
+    "key": "<paste your secret here>"
+}
+```
+
+## Running Hasura with docker compose
+
+Remember the json file we created? We're going to put it to good use here.
+
+> Why though? Docker compose does not really like setting environment variables as json, for me this is - as of writing - the most convenient 
+> way to set `HASURA_GRAPHQL_JWT_SECRET` is the docker compose file.
+
+```
+HASURA_GRAPHQL_JWT_SECRET=$(cat hasura-graphql-jwt-secret.json) docker-compose up -d
+```
+
 
