@@ -1,6 +1,7 @@
-import Layout from '../components/layout'
-
-export default function Page () {
+import Layout from '@/components/Layout'
+import { NextPage } from 'next'
+import React from 'react'
+const ClientPage:NextPage = () => {
   return (
     <Layout>
       <h1>Client Side Rendering</h1>
@@ -20,3 +21,4 @@ export default function Page () {
     </Layout>
   )
 }
+export default ClientPage

@@ -1,6 +1,8 @@
-import Layout from '../components/layout'
+import Layout from '@/components/Layout'
+import { NextPage } from 'next'
+import React from 'react'
 
-export default function Page () {
+const PolicyPage : NextPage = () => {
   return (
     <Layout>
       <p>
@@ -28,3 +30,4 @@ export default function Page () {
     </Layout>
   )
 }
+export default PolicyPage

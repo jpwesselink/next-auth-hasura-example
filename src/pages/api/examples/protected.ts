@@ -1,7 +1,8 @@
 // This is an example of to protect an API route
+import { NextApiHandler } from 'next';
 import { getSession } from 'next-auth/client'
 
-export default async (req, res) => {
+const protectedHandler: NextApiHandler = async (req, res) => {
   const session = await getSession({ req })
 
   if (session) {
@@ -10,3 +11,5 @@ export default async (req, res) => {
     res.send({ error: 'You must be sign in to view the protected content on this page.' })
   }
 }
+
+export default protectedHandler;
