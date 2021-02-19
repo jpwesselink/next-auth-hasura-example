@@ -1,12 +1,13 @@
 import NextAuth from "next-auth"
 import Providers from "next-auth/providers"
 import jsonwebtoken from "jsonwebtoken";
-import { decode, encode } from "../../../src/lib/jwt";
-import { jwt, session } from "../../../src/lib/callbacks";
+import { decode, encode } from "../../../lib/jwt";
+import { jwt, session } from "../../../lib/callbacks";
+import { NextApiHandler } from "next";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
-export default NextAuth({
+const nextAuthHandler:NextApiHandler = (req, res) => NextAuth(req, res, { 
   // https://next-auth.js.org/configuration/providers
   providers: [
     Providers.GitHub({
@@ -86,3 +87,6 @@ export default NextAuth({
   // Enable debug messages in the console if you are having problems
   debug: true,
 })
+
+
+export default nextAuthHandler;

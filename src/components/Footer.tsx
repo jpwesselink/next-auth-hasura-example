@@ -1,8 +1,8 @@
 import Link from "next/link"
 import styles from "./footer.module.css"
-import { dependencies } from "../package.json"
-
-export default function Footer() {
+import { dependencies } from "../../package.json"
+import { FC } from "react"
+const Footer:FC = () => {
   return (
     <footer className={styles.footer}>
       <hr />
@@ -28,3 +28,5 @@ export default function Footer() {
     </footer>
   )
 }
+
+export default Footer;
