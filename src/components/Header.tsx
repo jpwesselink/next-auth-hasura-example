@@ -53,9 +53,9 @@ const Header: FC = () => {
               <a
                 href="/api/auth/signout"
                 className={styles.button}
-                onClick={e => {
-                  e.preventDefault();
+                onClick={() => {
                   signOut();
+                  // e.preventDefault();
                 }}>
                 Sign out
               </a>

@@ -1,14 +1,17 @@
 import React from 'react';
 
-import { Provider } from 'next-auth/client';
+import { ApolloProvider } from '@apollo/client';
+import { Provider as SessionProvider } from 'next-auth/client';
 
 import './styles.css';
+import { useApollo } from '@/lib/apolloClient';
 
 // Use the <Provider> to improve performance and allow components that call
 // `useSession()` anywhere in your application to access the `session` object.
 export default function App({ Component, pageProps }) {
+  const apolloClient = useApollo(pageProps.initialApolloState);
   return (
-    <Provider
+    <SessionProvider
       // Provider options are not required but can be useful in situations where
       // you have a short session maxAge time. Shown here with default values.
       options={{
@@ -27,7 +30,9 @@ export default function App({ Component, pageProps }) {
         keepAlive: 0
       }}
       session={pageProps.session}>
-      <Component {...pageProps} />
-    </Provider>
+      <ApolloProvider client={apolloClient}>
+        <Component {...pageProps} />
+      </ApolloProvider>
+    </SessionProvider>
   );
 }

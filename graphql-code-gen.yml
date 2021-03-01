@@ -1,0 +1,25 @@
+schema: 
+  - ${HASURA_GRAPHQL_URL}:
+      headers: 
+        x-hasura-admin-secret: ${HASURA_GRAPHQL_ADMIN_SECRET}
+overwrite: true
+generates:
+  ./src/lib/graphql/generated/auth.tsx:
+    documents: ./hasura-queries.graphql
+    plugins:
+      - add:
+          content: "/* tslint:disable */ /* eslint-disable */"
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+      - fragment-matcher
+    config:
+      noGraphQLTag: true
+      withComponent: false
+      withMutationFn: true
+      useIndexSignature: true
+      avoidOptionals: false
+      withHooks: true
+      exportFragmentSpreadSubTypes: true
+      scalars: 
+        uuid: string

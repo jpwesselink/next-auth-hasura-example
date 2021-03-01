@@ -4,7 +4,7 @@ services:
     image: postgres:12
     restart: always
     volumes:
-    - db_data:/var/lib/postgresql/data
+    - hasura_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgrespassword
   graphql-engine:
@@ -24,6 +24,8 @@ services:
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: admin
       HASURA_GRAPHQL_JWT_SECRET: ${HASURA_GRAPHQL_JWT_SECRET}
+      HASURA_EVENT_HOOK_URL: http://localhost
+      HASURA_EVENT_HOOK_SECRET: whatever
 volumes:
-  db_data:
+  hasura_data:
 

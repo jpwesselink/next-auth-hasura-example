@@ -52,7 +52,7 @@ It should look something like this:
 SECRET=<insert your secret here>
 ```
 
-- Create `hasura-grahql-jwt-secret.json` for Docker compose
+- Create `hasura-graphql-jwt-secret.json` for Docker compose
 
 ```
 {
@@ -74,7 +74,7 @@ openssl genrsa -out private.pem 2048
 openssl rsa -in private.pem -pubout -out public.pem
 ```
 
-- Transform public key to a single line, and copy to clipboard on Macos
+- Transform private key to a single line, and copy to clipboard on Macos
 
 ```
 awk -v ORS='\\n' '1' private.pem | pbcopy
@@ -97,7 +97,7 @@ SECRET="<paste your secret here>"
 awk -v ORS='\\n' '1' public.pem | pbcopy
 ```
 
-- Create `hasura-grahql-jwt-secret.json` for Docker compose
+- Create `hasura-graphql-jwt-secret.json` for Docker compose
 
 ```
 {

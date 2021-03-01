@@ -1,0 +1,78 @@
+fragment NextAuthUser on users {
+  id
+  name
+  email
+  image: picture
+  admin
+  organisations {
+    ...CTAOrganisationUsers
+  }
+}
+
+fragment CTAOrganisationUsers on organisation_users {
+  organisationAdmin
+  questionnaireAdmin
+  questionnaireUser
+  otisAdmin
+  otisUser
+  qollaborUser
+  qollaborAdmin
+  organisation {
+    id
+    name
+  }
+}
+
+fragment NextAuthAccount on accounts {
+  id
+  userId: user_id
+  providerId: provider_id
+  providerType: provider_type
+  providerAccountId: provider_account_id
+  refreshToken: refresh_token
+  accessToken: access_token
+  accessTokenExpires: access_token_expires
+  compoundId: compound_id
+}
+
+query getAnyUserByEmail($email: String!) {
+  users(where: { email: { _eq: $email }}) {
+    ...NextAuthUser
+  }
+}
+
+query getUserByEmail($email: String!) {
+  users(where: {has_logged_in: {_eq: true}, email: {_eq: $email}}) {
+    ...NextAuthUser
+  }
+}
+
+query getUserByEmailAndNameAndImage($email: String!, $name: String!, $image: String) {
+  users(where: {has_logged_in: {_eq: true}, email: {_eq: $email}, name: {_eq: $name}, picture: {_eq: $image}}) {
+    ...NextAuthUser
+  }
+}
+
+query getUserProviderByAccountId($providerId: String!, $providerAccountId: String!) {
+  users(where: {has_logged_in: {_eq: true}, accounts: {provider_id: {_eq: $providerId}, provider_account_id: {_eq: $providerAccountId}}}) {
+    ...NextAuthUser
+  }
+}
+
+mutation createUser($name: String!, $email: String!, $image: String) {
+  insert_users_one(object: {email: $email, name: $name, picture: $image, has_logged_in: true}, on_conflict: {constraint: users_email_key, update_columns: [name, picture, has_logged_in]}) {
+    ...NextAuthUser
+  }
+}
+
+mutation createAccount($userId: uuid!, $providerId: String!, $providerType: String!, $providerAccountId: String!, $refreshToken: String, $accessToken: String, $accessTokenExpires: timestamptz, $compoundId: String!) {
+  insert_accounts_one(object: {user_id: $userId, provider_id: $providerId, provider_type: $providerType, provider_account_id: $providerAccountId, refresh_token: $refreshToken, access_token: $accessToken, access_token_expires: $accessTokenExpires, compound_id: $compoundId}, on_conflict: {constraint: accounts_pkey, update_columns: [access_token, access_token_expires, refresh_token]}) {
+    ...NextAuthAccount
+  }
+}
+
+query getUsers {
+  users {
+    ...NextAuthUser
+  }
+}

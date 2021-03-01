@@ -1,19 +1,25 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Algorithm } from 'jsonwebtoken';
+import { JWTOptions } from 'next-auth';
 
-const signingAlgorithm = process.env.SIGNING_ALGORITHM || 'HS256';
-export const encode = async ({ secret, token }) => {
+import log from './logger';
+import { CTOA_NAMESPACE } from './roles';
+
+const signingAlgorithm = (process.env.SIGNING_ALGORITHM ||
+  'HS256') as Algorithm;
+
+export const encode = async ({ secret, token, ...rest }) => {
+  log('jwt.encode', { secret, token, rest: Object.keys(rest) });
+
   const jwtClaims = {
+    [CTOA_NAMESPACE]: token[CTOA_NAMESPACE],
+    admin: token.admin,
     sub: token.sub.toString(),
     name: token.name,
     email: token.email,
+    image: token.image,
+
     iat: Date.now() / 1000,
-    exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
-    'https://hasura.io/jwt/claims': {
-      'x-hasura-allowed-roles': ['user'],
-      'x-hasura-default-role': 'user',
-      'x-hasura-role': 'user',
-      'x-hasura-user-id': token.id
-    }
+    exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60
   };
   const encodedToken = jwt.sign(jwtClaims, secret, {
     algorithm: signingAlgorithm
@@ -21,11 +27,16 @@ export const encode = async ({ secret, token }) => {
   return encodedToken;
 };
 
-export const decode = async ({ secret, token }) => {
+export const decode: JWTOptions['decode'] = async ({
+  secret,
+  token,
+  ...rest
+}) => {
+  log('jwt.decode', { secret, token, rest: Object.keys(rest) });
   if (token) {
     const decodedToken = jwt.verify(token, secret, {
       algorithms: [signingAlgorithm]
-    });
+    }) as Record<string, any>;
     return decodedToken;
   }
 
@@ -33,6 +44,7 @@ export const decode = async ({ secret, token }) => {
 };
 
 export const getToken = async params => {
+  log('jwt.getToken', { params: Object.keys(params) });
   const {
     req,
     // Use secure prefix for cookie name, unless URL is NEXTAUTH_URL is http://

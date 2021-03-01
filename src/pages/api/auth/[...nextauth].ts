@@ -3,7 +3,9 @@ import { NextApiHandler } from 'next';
 import NextAuth from 'next-auth';
 import Providers from 'next-auth/providers';
 
-import { jwt, session } from '../../../lib/callbacks';
+import hasuraAdapter from '@/lib/hasura-adapter';
+
+import { jwt, session, signIn } from '../../../lib/callbacks';
 import { decode, encode } from '../../../lib/jwt';
 
 // For more information on each option (and a full list of options) go to
@@ -15,8 +17,20 @@ const nextAuthHandler: NextApiHandler = (req, res) =>
       Providers.GitHub({
         clientId: process.env.GITHUB_ID,
         clientSecret: process.env.GITHUB_SECRET
+      }),
+      Providers.Google({
+        clientId: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET
+      }),
+      Providers.Spotify({
+        clientId: process.env.SPOTIFY_ID,
+        clientSecret: process.env.SPOTIFY_SECRET
       })
     ],
+    adapter: hasuraAdapter.Adapter(
+      { hasuraGraphQLUrl: process.env.HASURA_GRAPHQL_URL },
+      {}
+    ),
     // Database optional. MySQL, Maria DB, Postgres and MongoDB are supported.
     // https://next-auth.js.org/configuration/databases
     //
@@ -77,6 +91,7 @@ const nextAuthHandler: NextApiHandler = (req, res) =>
     callbacks: {
       // async signIn(user, account, profile) { return true },
       // async redirect(url, baseUrl) { return baseUrl },
+      signIn,
       session,
       jwt
     },

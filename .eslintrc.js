@@ -1,9 +1,90 @@
 module.exports = {
   extends: ['prettier/@typescript-eslint', 'airbnb-typescript-prettier'],
-  plugins: ['import', 'unused-imports'],
   parserOptions: {
     project: './tsconfig.json',
     tsconfigRootDir: __dirname
+  },
+  plugins: ['import', 'unused-imports', 'sort-keys-fix'],
+  rules: {
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/no-shadow': 'warn',
+    '@typescript-eslint/no-unused-vars': 'off',
+    camelcase: 0,
+    'import/no-cycle': 'warn',
+    'import/no-unresolved': 'error',
+    'import/order': [
+      'error',
+      {
+        alphabetize: {
+          caseInsensitive: true,
+          order: 'asc'
+        },
+        groups: ['builtin', 'external', 'internal'],
+        'newlines-between': 'always',
+        pathGroups: [
+          {
+            group: 'external',
+            pattern: 'react',
+            position: 'before'
+          },
+          {
+            group: 'external',
+            pattern: 'googleapis',
+            position: 'before'
+          },
+          {
+            group: 'external',
+            pattern: 'next',
+            position: 'before'
+          }
+        ],
+        pathGroupsExcludedImportTypes: ['react']
+      }
+    ],
+    'jsx-a11y/anchor-is-valid': 'warn',
+    'no-underscore-dangle': 'off',
+    'no-unused-vars': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        arrowParens: 'avoid',
+        bracketSpacing: true,
+        jsxBracketSameLine: true,
+        singleQuote: true,
+        trailingComma: 'none',
+        usePrettierrc: false
+      }
+    ],
+    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/rules-of-hooks': 'error',
+    'react/jsx-filename-extension': [
+      1,
+      { extensions: ['.js', '.jsx', '.tsx'] }
+    ],
+    'react/jsx-props-no-spreading': 0,
+    'sort-keys-fix/sort-keys-fix': 'warn',
+    'sort-vars': 'error',
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-imports-ts': 'error',
+    'unused-imports/no-unused-vars': [
+      'error',
+      {
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        vars: 'all',
+        varsIgnorePattern: '^_'
+      }
+    ],
+    'unused-imports/no-unused-vars-ts': [
+      'error',
+      {
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        vars: 'all',
+        varsIgnorePattern: '^_'
+      }
+    ]
   },
   settings: {
     'import/parsers': {
@@ -14,81 +95,5 @@ module.exports = {
         project: './tsconfig.json'
       }
     }
-  },
-  rules: {
-    camelcase: 0,
-    'jsx-a11y/anchor-is-valid': 'warn',
-    'import/no-unresolved': 'error',
-    'import/no-cycle': 'warn',
-    'import/order': [
-      'error',
-      {
-        groups: ['builtin', 'external', 'internal'],
-        pathGroups: [
-          {
-            pattern: 'react',
-            group: 'external',
-            position: 'before'
-          },
-          {
-            pattern: 'googleapis',
-            group: 'external',
-            position: 'before'
-          },
-          {
-            pattern: 'next',
-            group: 'external',
-            position: 'before'
-          }
-        ],
-        pathGroupsExcludedImportTypes: ['react'],
-        'newlines-between': 'always',
-        alphabetize: {
-          order: 'asc',
-          caseInsensitive: true
-        }
-      }
-    ],
-    'no-underscore-dangle': 'off',
-    'no-unused-vars': 'off',
-    'unused-imports/no-unused-imports': 'error',
-    'unused-imports/no-unused-vars': [
-      'error',
-      {
-        vars: 'all',
-        varsIgnorePattern: '^_',
-        args: 'after-used',
-        argsIgnorePattern: '^_'
-      }
-    ],
-    '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/no-empty-function': 'warn',
-    'unused-imports/no-unused-imports-ts': 'error',
-    'unused-imports/no-unused-vars-ts': [
-      'error',
-      {
-        vars: 'all',
-        varsIgnorePattern: '^_',
-        args: 'after-used',
-        argsIgnorePattern: '^_'
-      }
-    ],
-    'prettier/prettier': [
-      'error',
-      {
-        usePrettierrc: false,
-        singleQuote: true,
-        bracketSpacing: true,
-        jsxBracketSameLine: true,
-        trailingComma: 'none',
-        arrowParens: 'avoid'
-      }
-    ],
-    'react/jsx-props-no-spreading': 0,
-    'react/jsx-filename-extension': [
-      1,
-      { extensions: ['.js', '.jsx', '.tsx'] }
-    ],
-    '@typescript-eslint/explicit-module-boundary-types': 'off'
   }
 };

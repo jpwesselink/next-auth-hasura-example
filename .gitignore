@@ -112,3 +112,6 @@ dist
 
 hasura-graphql-jwt-secret.json
 *.pem
+
+api-secret.json
+
